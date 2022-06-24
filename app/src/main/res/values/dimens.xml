@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="toolbar_elevation">10dp</dimen>
+    <dimen name="extra_large_text">64sp</dimen>
+    <dimen name="large_text">42sp</dimen>
+</resources>
