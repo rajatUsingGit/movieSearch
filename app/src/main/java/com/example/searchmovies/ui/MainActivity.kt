@@ -1,9 +1,13 @@
 package com.example.searchmovies.ui
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -16,35 +20,50 @@ import kotlinx.coroutines.flow.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModels()
+    private val mViewModel: MainViewModel by viewModels()
+    private lateinit var searchItem: MenuItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(mBinding.root)
+        mBinding.lifecycleOwner = this
+        mBinding.viewModel = mViewModel
+        mBinding.recyclerView.adapter = MainListAdapter()
         setSupportActionBar(mBinding.customToolbar)
-        supportActionBar?.title = getString(R.string.search_your_favorite_movie)
+        supportActionBar?.title = ""
+        setContentView(mBinding.root)
+        mBinding.customToolbar.setOnClickListener {
+            onSearchRequested()
+        }
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    override fun onSearchRequested(): Boolean {
+        searchItem.expandActionView()
+        searchItem.actionView.requestFocus()
+        return super.onSearchRequested()
+    }
+
+    @OptIn(FlowPreview::class)
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_menu, menu)
-        val searchItem = menu.findItem(R.id.action_search)
+        searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView?
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                (searchItem?.actionView as SearchView?)?.apply {
+                searchView?.apply {
                     onQueryTextFlow()
-                        .debounce(500)
+                        .debounce(1000)
                         .distinctUntilChanged()
-                        .flatMapLatest { query -> viewModel.getDataFromNetwork(query) }
-                        .flowOn(Dispatchers.IO)
-                        .catch { viewModel.getDataFromLocalDb(query.toString())}
-                        .collect { result ->
-                            if (result.isNotEmpty()) {
-                                mBinding.welcomeText.text = result
+                        .flowOn(Dispatchers.Default)
+                        .collect { query ->
+                            if (query.isNotEmpty()) {
+                                mBinding.welcomeText.visibility = View.GONE
+                                mBinding.recyclerView.visibility = View.VISIBLE
+                                mViewModel.refreshUI(query)
                             } else {
-                                mBinding.welcomeText.text = getString(R.string.welcome)
+                                mBinding.welcomeText.visibility = View.VISIBLE
+                                mBinding.recyclerView.visibility = View.GONE
                             }
                         }
                 }

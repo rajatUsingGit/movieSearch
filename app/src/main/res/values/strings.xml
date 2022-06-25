@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">SearchMovies</string>
-    <string name="search_your_favorite_movie">Search Your Favorite Movie Here</string>
+    <string name="search_your_favorite_movie">Search Away!</string>
     <string name="search">Search movies!</string>
-    <string name="welcome">Welcome!</string>
+    <string name="welcome">Search A Movie!</string>
     <string name="app_label">Search Movies</string>
 </resources>
