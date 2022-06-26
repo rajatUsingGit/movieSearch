@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityMainBinding
     private val mViewModel: MainViewModel by viewModels()
-    private lateinit var searchItem: MenuItem
+    private lateinit var mSearchItem: MenuItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,57 +30,57 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(mBinding.searchBar)
         supportActionBar?.title = ""
         setContentView(mBinding.root)
+        runUILogic()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.action_menu, menu)
+        mSearchItem = menu.findItem(R.id.action_search)
+        val searchView = mSearchItem.actionView as SearchView?
+
         mBinding.searchBar.setOnClickListener {
             onSearchRequested()
         }
-    }
 
-    @OptIn(FlowPreview::class)
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.action_menu, menu)
-        searchItem = menu.findItem(R.id.action_search)
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                (searchItem.actionView as SearchView?)?.apply {
-                    onQueryTextFlow()
-                        .debounce(500)
-                        .distinctUntilChanged()
-                        .flowOn(Dispatchers.Default)
-                        .collect { query ->
-                            if (query.isNotEmpty()) {
-                                mBinding.welcomeText.visibility = View.GONE
-                                mViewModel.onNewSearch(query)
-                                mBinding.recyclerView.visibility = View.VISIBLE
-                            } else {
-                                mBinding.welcomeText.visibility = View.VISIBLE
-                                mBinding.recyclerView.visibility = View.GONE
-                            }
-                        }
-                }
-            }
+        searchView?.apply {
+            onActionViewExpanded()
+            setQuery(mViewModel.query.value, false)
+            setOnQueryTextListener(
+                object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String): Boolean {
+                        return true
+                    }
+                    override fun onQueryTextChange(newText: String): Boolean {
+                        mViewModel.query.value = newText
+                        return true
+                    }
+                })
         }
+
         return true
     }
 
     override fun onSearchRequested(): Boolean {
-        searchItem.expandActionView()
-        searchItem.actionView.requestFocus()
+        mSearchItem.expandActionView()
+        mSearchItem.actionView.requestFocus()
         return super.onSearchRequested()
     }
 
-    private fun SearchView.onQueryTextFlow(): StateFlow<String> {
-        val query = MutableStateFlow("")
-        setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
+    @OptIn(FlowPreview::class)
+    private fun runUILogic() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mViewModel.query.debounce(500).collect {
+                    mBinding.apply {
+                        welcomeText.visibility =
+                            if (it.isEmpty()) View.VISIBLE else View.GONE
+                        recyclerView.visibility =
+                            if (it.isNotEmpty()) View.VISIBLE else View.GONE
+                    }
+                    mViewModel.onNewSearch()
+                }
             }
-            override fun onQueryTextChange(newText: String): Boolean {
-                query.value = newText
-                return true
-            }
-        })
-        return query
+        }
     }
 
 }

@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.searchmovies.Constants
-import com.example.searchmovies.R
 import com.example.searchmovies.data.ResponseItem
 import com.example.searchmovies.databinding.ListItemBinding
 
@@ -17,9 +16,8 @@ class MainListAdapter :
 
     private lateinit var mContext: Context
 
-    class MainListViewHolder(
-        val binding: ListItemBinding
-    ) : RecyclerView.ViewHolder(binding.root)
+    class MainListViewHolder(val binding: ListItemBinding)
+        : RecyclerView.ViewHolder(binding.root)
 
     companion object DiffCallback : DiffUtil.ItemCallback<ResponseItem>() {
         override fun areItemsTheSame(oldItem: ResponseItem, newItem: ResponseItem): Boolean {
@@ -27,7 +25,7 @@ class MainListAdapter :
         }
 
         override fun areContentsTheSame(oldItem: ResponseItem, newItem: ResponseItem): Boolean {
-            return oldItem.title == newItem.title
+            return oldItem.title == newItem.title && oldItem.posterPath == newItem.posterPath
         }
     }
 

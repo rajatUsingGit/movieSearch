@@ -11,7 +11,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/container"
-        android:background="@color/purple_700"
+        android:background="@color/primary_color"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -49,6 +49,7 @@
             android:textSize="@dimen/large_text"
             android:textColor="@color/white"
             android:textStyle="bold"
+            android:visibility="gone"
             app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -59,7 +60,7 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@color/purple_700"
+            android:background="@color/primary_color"
             tools:listitem="@layout/list_item"
             app:listData="@{viewModel.responses}"
             android:visibility="gone"

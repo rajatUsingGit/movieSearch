@@ -6,6 +6,9 @@ import com.example.searchmovies.data.ResponseItem
 
 
 @BindingAdapter("listData")
-fun listData(recyclerView: RecyclerView, movieItems: List<ResponseItem>?) {
-    (recyclerView.adapter as MainListAdapter?)?.submitList(movieItems)
-}
+fun listData(
+    recyclerView: RecyclerView,
+    movieItems: List<ResponseItem>?
+) = (recyclerView.adapter as MainListAdapter?)?.submitList(movieItems)
+
+

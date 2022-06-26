@@ -8,6 +8,7 @@ import com.example.searchmovies.data.ResponseItem
 
 @Database(entities = [ResponseItem::class], version = 1, exportSchema = false)
 abstract class SearchDatabase : RoomDatabase() {
+
     abstract fun getDao(): SearchDao
 
     companion object {
