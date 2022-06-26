@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "response")
+@Entity(tableName = "search_table")
 data class ResponseItem(
     @PrimaryKey @ColumnInfo @SerializedName("id") val id: Int,
     @ColumnInfo @SerializedName("title") val title: String,

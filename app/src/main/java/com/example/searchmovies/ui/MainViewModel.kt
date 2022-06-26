@@ -1,7 +1,7 @@
 package com.example.searchmovies.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.searchmovies.data.ResponseItem
@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private var _responses: MutableStateFlow<List<ResponseItem>> = MutableStateFlow(emptyList())
     val responses: StateFlow<List<ResponseItem>> = _responses
-    private val repository = SearchRepository()
+    private val repository = SearchRepository(application)
 
-    fun refreshUI(query: String) {
+    fun onNewSearch(query: String) {
         viewModelScope.launch {
-            _responses.value = repository.getDataFromNetwork(query)
+            _responses.value = repository.getData(query)
         }
     }
 

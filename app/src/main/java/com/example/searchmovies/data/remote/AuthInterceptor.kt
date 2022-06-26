@@ -1,4 +1,4 @@
-package com.example.searchmovies.data
+package com.example.searchmovies.data.remote
 
 import com.example.searchmovies.Constants
 import okhttp3.Interceptor
